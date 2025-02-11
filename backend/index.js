@@ -65,15 +65,43 @@ app.get('/books', async (request, response) => {
 })
 
 // route for get one book from Database by id
-app.get('/book/:id', async (request, response) => {
+app.get('/books/:id', async (request, response) => {
     try {
-        const {id} = request.params;
+        const { id } = request.params;
         const book = await BookStore.findById(id);
         return response.status(200).send(book);
     }
     catch (error) {
         console.log(error);
         return response.status(500).send({
+            message: error.message
+        })
+    }
+})
+
+// route for update a book
+app.put('/books/:id', async (request, response) => {
+    try {
+        if (!request.body.title ||
+            !request.body.author ||
+            !request.body.publishYear
+        ) {
+            return response.status(400).send({
+                message: "Send all required fields: title, author, publishYear"
+            });
+        }
+
+        const { id } = request.params;
+        const result = await BookStore.findByIdAndUpdate(id, request.body);
+        if (!result) {
+            return response.status(404).json({ message: "Book not found" });
+        }
+
+        return response.status(200).send({ message: "Book updated successfully" });
+    }
+    catch (error) {
+        console.log(error);
+        response.status(500).send({
             message: error.message
         })
     }
