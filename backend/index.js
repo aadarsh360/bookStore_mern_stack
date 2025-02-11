@@ -18,14 +18,13 @@ app.get('/', (request, response) => {
     return response.status(234).send("Welcome To MERN Stack Project");
 })
 
-// routes for save new books
+// routes for save new book in Database
 app.post('/books', async (request, response) => {
     try {
         if (!request.body.title ||
             !request.body.author ||
             !request.body.publishYear
-        )
-         {
+        ) {
             return response.status(400).send({
                 message: "Send all required fields: title, author, publishYear"
             })
@@ -47,6 +46,23 @@ app.post('/books', async (request, response) => {
     }
 })
 
+// route for get all books from Database
+app.get('/books', async (request, response) => {
+    try {
+        const books = await BookStore.find({});
+        return response.status(200).send({
+            count: books.length,
+            data: books
+        })
+
+    }
+    catch (error) {
+        console.log(error);
+        return response.status(500).send({
+            message: error.message
+        })
+    }
+})
 // database connection
 mongoose.connect(mongoDBURL)
     .then(() => {
